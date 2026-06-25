@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estratega Finanzas - Diagnóstico Inicial</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
+
+    <div class="max-w-md mx-auto px-4 py-8">
+        <header class="text-center mb-6">
+            <span class="bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">Regalo Exclusivo - Encriptados</span>
+            <h1 class="text-3xl font-black mt-3 tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Finanzas Sanas 2026</h1>
+            <p class="text-slate-400 text-sm mt-2">Construye el piso financiero antes de escalar tus inversiones.</p>
+        </header>
+
+        <!-- TABS -->
+        <div class="flex bg-slate-900 border border-slate-800 rounded-2xl p-1 mb-6 gap-1">
+            <button id="tab-calc" onclick="switchTab('calc')"
+                class="flex-1 text-sm font-semibold py-2 rounded-xl transition-all duration-200 text-white bg-emerald-500/20 text-emerald-300">
+                📊 Calculadora
+            </button>
+            <button id="tab-guia" onclick="switchTab('guia')"
+                class="flex-1 text-sm font-semibold py-2 rounded-xl transition-all duration-200 text-slate-400">
+                🎓 Guía & Tips
+            </button>
+        </div>
+
+        <!-- PANEL: CALCULADORA -->
+        <div id="panel-calc">
+            <main class="space-y-6">
+
+                <!-- SELECTOR DE MONEDA -->
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl space-y-3">
+                    <h2 class="text-sm font-bold text-white flex items-center gap-2">⚙️ ¿En qué moneda vas a ingresar tus datos?</h2>
+                    <div class="flex bg-slate-950 border border-slate-800 rounded-2xl p-1 gap-1">
+                        <button id="btn-moneda-usd" onclick="switchMoneda('usd')"
+                            class="flex-1 text-sm font-semibold py-2 rounded-xl transition-all duration-200 text-white bg-emerald-500/20 text-emerald-300">
+                            🇺🇸 USD (Dólares)
+                        </button>
+                        <button id="btn-moneda-cop" onclick="switchMoneda('cop')"
+                            class="flex-1 text-sm font-semibold py-2 rounded-xl transition-all duration-200 text-slate-400">
+                            🇨🇴 COP (Pesos)
+                        </button>
+                    </div>
+                    <div id="bloqueTasaCambio" class="hidden space-y-2 pt-1">
+                        <label class="text-xs text-slate-400 block font-medium">Tasa de cambio actual (1 USD = ? COP)</label>
+                        <input type="number" id="tasaCambio" min="1" step="0.01" value="3440"
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                            placeholder="Ej. 3440">
+                        <p class="text-[11px] text-slate-500 italic">Solo se usa para traducir tu capacidad de ahorro a USD y simular correctamente la acumulación de Bitcoin. Ajusta este valor a la tasa del día (TRM) cuando quieras.</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl">
+                    <h2 class="text-lg font-bold text-emerald-400 mb-4 flex items-center gap-2">💰 Ingresos Mensuales</h2>
+                    <div class="space-y-2">
+                        <label class="text-xs text-slate-400 block font-medium">Tus ingresos netos actuales <span class="currency-unit text-emerald-500/80">(USD)</span></label>
+                        <input type="number" id="ingresos" min="0" step="0.01"
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                            placeholder="Ej. 1500">
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl space-y-4">
+                    <h2 class="text-lg font-bold text-rose-400 flex items-center gap-2">📉 Tus Gastos</h2>
+                    <div class="space-y-2">
+                        <label class="text-xs text-slate-400 block font-medium">Gastos Fijos (Arriendo, servicios, cuotas obligatorias) <span class="currency-unit text-rose-500/80">(USD)</span></label>
+                        <input type="number" id="gastosFijos" min="0" step="0.01"
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-rose-500 transition-colors"
+                            placeholder="Ej. 600">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs text-slate-400 block font-medium">Gastos Hormiga (Suscripciones, cafés, salidas innecesarias) <span class="currency-unit text-rose-500/80">(USD)</span></label>
+                        <input type="number" id="gastosHormiga" min="0" step="0.01"
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-rose-500 transition-colors"
+                            placeholder="Ej. 150">
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl space-y-4">
+                    <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2">🛡️ Tus Fondos</h2>
+                    <div class="space-y-2">
+                        <label class="text-xs text-slate-400 block font-medium">Fondo de Tranquilidad / Ahorro actual <span class="currency-unit text-cyan-500/80">(USD)</span></label>
+                        <input type="number" id="fondoAhorro" min="0" step="0.01"
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                            placeholder="Ej. 300">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs text-slate-400 block font-medium">Fondo de Inversión / Capital de Trabajo actual <span class="currency-unit text-cyan-500/80">(USD)</span></label>
+                        <input type="number" id="fondoInversion" min="0" step="0.01"
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                            placeholder="Ej. 500">
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border-2 border-emerald-500/30 p-5 rounded-2xl shadow-2xl bg-gradient-to-b from-slate-900 to-emerald-950/20">
+                    <h2 class="text-base font-bold text-white mb-4">📊 Tu Diagnóstico en Tiempo Real</h2>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+                            <span class="text-xs text-slate-400 block">Capacidad de Ahorro</span>
+                            <span id="resCapacidad" class="text-xl font-black text-emerald-400">$0</span>
+                            <span id="resCapacidadUnidad" class="text-[10px] text-slate-500 block uppercase font-mono">USD</span>
+                        </div>
+                        <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+                            <span class="text-xs text-slate-400 block">Ratio Capital / Ingresos</span>
+                            <span id="resRatioInversion" class="text-xl font-black text-cyan-400">—</span>
+                        </div>
+                    </div>
+                    <div class="mt-5 space-y-2">
+                        <div class="flex justify-between text-xs font-medium">
+                            <span class="text-slate-400">Progreso Fondo de Tranquilidad</span>
+                            <span id="txtProgreso" class="text-slate-500">—</span>
+                        </div>
+                        <div class="w-full bg-slate-950 rounded-full h-3 border border-slate-800 overflow-hidden">
+                            <div id="barraProgreso" class="bg-gradient-to-r from-emerald-500 to-cyan-400 h-full transition-all duration-500" style="width:0%"></div>
+                        </div>
+                        <p class="text-[11px] text-slate-500 italic text-center mt-1">Meta: mínimo 3 meses de gastos fijos indispensables.</p>
+                    </div>
+                    <div id="mensajeDiag" class="mt-4 text-xs text-slate-400 bg-slate-950/50 rounded-xl px-4 py-3 border border-slate-800 leading-relaxed hidden"></div>
+                </div>
+
+    
+            <!-- BTC Urgency Block -->
+            <div id="btcUrgency" class="hidden bg-gradient-to-b from-slate-900 to-slate-950 border border-yellow-500/20 p-5 rounded-2xl space-y-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">₿</span>
+                    <h3 class="text-sm font-bold text-yellow-400 uppercase tracking-wider font-mono">¿Y si ese dinero comprara Bitcoin?</h3>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">Con lo que pierdes en gastos que no necesitas, podrías estar acumulando el activo más escaso del planeta. Mira el impacto real:</p>
+                <p id="btcEquivalencia" class="hidden text-[11px] text-cyan-300/80 bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-center"></p>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-slate-950 border border-yellow-500/10 rounded-xl p-3 text-center">
+                        <span class="text-[10px] text-slate-500 block font-mono uppercase">En 1 año acumulas</span>
+                        <span id="btc1y" class="text-base font-black text-yellow-400 block mt-1">—</span>
+                        <span class="text-[10px] text-slate-500">BTC</span>
+                    </div>
+                    <div class="bg-slate-950 border border-yellow-500/10 rounded-xl p-3 text-center">
+                        <span class="text-[10px] text-slate-500 block font-mono uppercase">En 5 años (DCA)</span>
+                        <span id="btc5y" class="text-base font-black text-yellow-400 block mt-1">—</span>
+                        <span class="text-[10px] text-slate-500">BTC</span>
+                    </div>
+                </div>
+                <p id="btcMensaje" class="text-[11px] text-yellow-300/70 italic text-center leading-relaxed"></p>
+                <a href="https://pay.hotmart.com/X105006696K" target="_blank"
+                    class="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-slate-950 font-bold text-sm py-3 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-yellow-500/10">
+                    ₿ Acceder a Crypto Control 360 — $12
+                </a>
+            </div>
+
+            <!-- Plantilla Excel -->
+            <div class="bg-slate-900 border border-emerald-500/20 p-5 rounded-2xl text-center space-y-3">
+                <p class="text-xs text-emerald-400 font-mono font-medium uppercase tracking-wider">🎁 Herramienta gratuita</p>
+                <h3 class="text-sm font-bold text-white">Descarga la Plantilla de Presupuesto Mensual</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">Registra ingresos fijos, variables, gastos y encuentra el hueco exacto donde se escapa tu dinero. Incluye simulador DCA en BTC.</p>
+                <a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,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"
+                    download="Planificador_Financiero_Encriptados.xlsx"
+                    class="inline-block w-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-bold text-sm py-3 rounded-xl hover:bg-emerald-500/30 transition-colors">
+                    📥 Descargar Plantilla Excel (.xlsx)
+                </a>
+            </div>
+
+            <div class="hidden bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 p-5 rounded-2xl text-center space-y-3">
+                    <p class="text-xs text-amber-300 font-medium font-mono">🚀 ¿FINANZAS SANAS? PASO SIGUIENTE:</p>
+                    <h3 class="text-sm font-bold text-white px-2">Pon a trabajar tu capital sobrante de forma inteligente y automatizada.</h3>
+                    <a href="https://pay.hotmart.com/X105006696K" target="_blank"
+                        class="inline-block w-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold text-sm py-3 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-orange-500/10">
+                        Descargar Plantilla DCA Avanzada ($12)
+                    </a>
+                </div>
+
+            </main>
+        </div>
+
+        <!-- PANEL: GUÍA & TIPS -->
+        <div id="panel-guia" class="hidden space-y-5">
+
+            <!-- Cómo usar la herramienta -->
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <h2 class="text-base font-bold text-emerald-400 mb-4">📋 Cómo usar esta herramienta</h2>
+                <ol class="space-y-4">
+                    <li class="flex gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold flex items-center justify-center">1</span>
+                        <div>
+                            <p class="text-sm font-semibold text-white">Elige tu moneda</p>
+                            <p class="text-xs text-slate-400 mt-1">Arriba en la calculadora, escoge si vas a registrar tus cifras en dólares (USD) o en pesos colombianos (COP). Si elegiste COP, ajusta la tasa de cambio a la del día.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold flex items-center justify-center">2</span>
+                        <div>
+                            <p class="text-sm font-semibold text-white">Ingresa tus ingresos netos</p>
+                            <p class="text-xs text-slate-400 mt-1">Lo que realmente te queda después de impuestos y deducciones. Si tienes múltiples fuentes, súmalas todas.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 text-xs font-bold flex items-center justify-center">3</span>
+                        <div>
+                            <p class="text-sm font-semibold text-white">Registra tus gastos con honestidad</p>
+                            <p class="text-xs text-slate-400 mt-1"><strong class="text-slate-300">Fijos:</strong> arriendo, servicios, deudas, cuotas que no puedes evitar este mes.<br><strong class="text-slate-300">Hormiga:</strong> todo lo discrecional — Netflix, Rappi, salidas, suscripciones que olvidaste.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 text-xs font-bold flex items-center justify-center">4</span>
+                        <div>
+                            <p class="text-sm font-semibold text-white">Declara tus fondos actuales</p>
+                            <p class="text-xs text-slate-400 mt-1"><strong class="text-slate-300">Tranquilidad:</strong> ahorros que no tocarías en una emergencia de 3 meses.<br><strong class="text-slate-300">Inversión:</strong> capital que ya tienes en cripto, DeFi o listo para entrar.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold flex items-center justify-center">5</span>
+                        <div>
+                            <p class="text-sm font-semibold text-white">Lee tu diagnóstico</p>
+                            <p class="text-xs text-slate-400 mt-1">El dashboard calcula en tiempo real tu capacidad de ahorro, el peso de tu capital y qué tan cerca estás de poder invertir con criterio.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Tips de ahorro -->
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <h2 class="text-base font-bold text-cyan-400 mb-4">💡 Tips de Ahorro</h2>
+                <div class="space-y-3">
+                    <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-3">
+                        <p class="text-xs font-semibold text-white mb-1">La regla del 24 horas</p>
+                        <p class="text-xs text-slate-400">Antes de cualquier compra no esencial mayor a $20, espera un día. El 80% de esas compras desaparecen solas.</p>
+                    </div>
+                    <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-3">
+                        <p class="text-xs font-semibold text-white mb-1">Págate primero (automatizado)</p>
+                        <p class="text-xs text-slate-400">El día que ingresa tu salario, transfiere automáticamente al fondo de tranquilidad. Lo que no ves, no gastas.</p>
+                    </div>
+                    <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-3">
+                        <p class="text-xs font-semibold text-white mb-1">Audita tus suscripciones cada 3 meses</p>
+                        <p class="text-xs text-slate-400">Revisa tu extracto bancario y cancela todo lo que no usaste en el último mes. El promedio de suscripciones olvidadas es $47/mes.</p>
+                    </div>
+                    <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-3">
+                        <p class="text-xs font-semibold text-white mb-1">Fondo de tranquilidad en stablecoin</p>
+                        <p class="text-xs text-slate-400">Si tienes tu fondo en USDC en un protocolo seguro generando 4-6% APY, tu ahorro trabaja mientras te protege. Más eficiente que el banco.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips de inversión -->
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <h2 class="text-base font-bold text-amber-400 mb-4">🚀 Tips de Inversión DeFi</h2>
+                <div class="space-y-3">
+                    <div class="bg-slate-950/60 border border-amber-500/10 rounded-xl p-3">
+                        <p class="text-xs font-semibold text-white mb-1">No inviertas sin fondo de tranquilidad</p>
+                        <p class="text-xs text-slate-400">Si necesitas el dinero en 3 meses, no está disponible para DeFi. La liquidez forzada en el momento equivocado destruye cualquier estrategia.</p>
+                    </div>
+                    <div class="bg-slate-950/60 border border-amber-500/10 rounded-xl p-3">
+                        <p class="text-xs font-semibold text-white mb-1">DCA sobre timing</p>
+                        <p class="text-xs text-slate-400">Invertir una cantidad fija cada semana o mes elimina el riesgo de entrar en el peor momento. La consistencia supera al análisis perfecto.</p>
+                    </div>
+                    <div class="bg-slate-950/60 border border-amber-500/10 rounded-xl p-3">
+                        <p class="text-xs font-semibold text-white mb-1">El ratio capital/ingresos importa</p>
+                        <p class="text-xs text-slate-400">Si tu ratio capital/ingresos es mayor a 300%, ya tienes suficiente masa crítica para que el yield compuesto trabaje a tu favor. Bajo ese umbral, prioriza acumulación.</p>
+                    </div>
+                    <div class="bg-slate-950/60 border border-amber-500/10 rounded-xl p-3">
+                        <p class="text-xs font-semibold text-white mb-1">Yield Farming con liquidez concentrada</p>
+                        <p class="text-xs text-slate-400">En Uniswap V3/V4, un rango de liquidez bien calibrado sobre un par estable puede generar 15-40% APR con riesgo controlado. Pero esto requiere entender el impermanent loss primero.</p>
+                    </div>
+                    <div class="bg-slate-950/60 border border-amber-500/10 rounded-xl p-3">
+                        <p class="text-xs font-semibold text-white mb-1">Regla del 10%</p>
+                        <p class="text-xs text-slate-400">Nunca pongas más del 10% de tu capital total en una sola posición de alto riesgo. La diversificación dentro de DeFi no es cobardía, es gestión profesional.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA al final de guía -->
+            <div class="bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 p-5 rounded-2xl text-center space-y-2">
+                <p class="text-xs text-emerald-300 font-mono font-medium">¿Listo para ir más profundo?</p>
+                <p class="text-sm font-bold text-white">Aprende a construir ingresos pasivos sistematizados en DeFi.</p>
+                <button onclick="switchTab('calc')" class="inline-block w-full bg-emerald-500/20 text-emerald-300 font-bold text-sm py-3 rounded-xl hover:bg-emerald-500/30 transition-colors mt-1">
+                    Volver a mi Diagnóstico →
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const inputs = ['ingresos', 'gastosFijos', 'gastosHormiga', 'fondoAhorro', 'fondoInversion'];
+
+        let monedaActual = 'usd';
+
+        const PLACEHOLDERS = {
+            usd: { ingresos: 'Ej. 1500', gastosFijos: 'Ej. 600', gastosHormiga: 'Ej. 150', fondoAhorro: 'Ej. 300', fondoInversion: 'Ej. 500' },
+            cop: { ingresos: 'Ej. 5000000', gastosFijos: 'Ej. 2000000', gastosHormiga: 'Ej. 500000', fondoAhorro: 'Ej. 1000000', fondoInversion: 'Ej. 1500000' }
+        };
+
+        function guardarLocal(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
+        function leerLocal(key)         { try { return localStorage.getItem(key); } catch (e) { return null; } }
+
+        function redondear(n, dec = 2) {
+            return Math.round(n * Math.pow(10, dec)) / Math.pow(10, dec);
+        }
+
+        function formatearNumero(n, esCop) {
+            return Math.abs(n).toLocaleString('es-CO', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: esCop ? 0 : 2
+            });
+        }
+
+        function mensajeDiagnostico(capacidad, progresoFondo, metaLlena) {
+            if (capacidad <= 0)
+                return "⚠️ Tus gastos superan tus ingresos. Antes de invertir, cierra esta brecha primero.";
+            if (progresoFondo < 50)
+                return "🛡️ Prioridad ahora: construir tu fondo de tranquilidad. Sin red de seguridad, DeFi es ruleta, no estrategia.";
+            if (metaLlena && capacidad > 0)
+                return "🚀 Base sólida. Puedes destinar tu capacidad de ahorro mensual a inversión sistematizada con criterio.";
+            return "📈 Vas bien. Mantén el ritmo y termina de blindar tu fondo de tranquilidad antes de escalar.";
+        }
+
+        function switchTab(tab) {
+            const esCalc = tab === 'calc';
+            document.getElementById('panel-calc').classList.toggle('hidden', !esCalc);
+            document.getElementById('panel-guia').classList.toggle('hidden', esCalc);
+
+            const btnCalc = document.getElementById('tab-calc');
+            const btnGuia = document.getElementById('tab-guia');
+
+            if (esCalc) {
+                btnCalc.className = 'flex-1 text-sm font-semibold py-2 rounded-xl transition-all duration-200 text-white bg-emerald-500/20 text-emerald-300';
+                btnGuia.className = 'flex-1 text-sm font-semibold py-2 rounded-xl transition-all duration-200 text-slate-400';
+            } else {
+                btnGuia.className = 'flex-1 text-sm font-semibold py-2 rounded-xl transition-all duration-200 text-white bg-cyan-500/20 text-cyan-300';
+                btnCalc.className = 'flex-1 text-sm font-semibold py-2 rounded-xl transition-all duration-200 text-slate-400';
+            }
+        }
+
+        function switchMoneda(m) {
+            monedaActual = m;
+            guardarLocal('moneda', m);
+            actualizarUIMoneda();
+            calcularFinanzas();
+        }
+
+        function actualizarUIMoneda() {
+            const esCop = monedaActual === 'cop';
+
+            // Botones
+            const btnUSD = document.getElementById('btn-moneda-usd');
+            const btnCOP = document.getElementById('btn-moneda-cop');
+            if (esCop) {
+                btnCOP.className = 'flex-1 text-sm font-semibold py-2 rounded-xl transition-all duration-200 text-white bg-cyan-500/20 text-cyan-300';
+                btnUSD.className = 'flex-1 text-sm font-semibold py-2 rounded-xl transition-all duration-200 text-slate-400';
+            } else {
+                btnUSD.className = 'flex-1 text-sm font-semibold py-2 rounded-xl transition-all duration-200 text-white bg-emerald-500/20 text-emerald-300';
+                btnCOP.className = 'flex-1 text-sm font-semibold py-2 rounded-xl transition-all duration-200 text-slate-400';
+            }
+
+            // Mostrar/ocultar tasa de cambio
+            document.getElementById('bloqueTasaCambio').classList.toggle('hidden', !esCop);
+
+            // Unidades junto a cada campo
+            document.querySelectorAll('.currency-unit').forEach(el => {
+                el.textContent = esCop ? '(COP)' : '(USD)';
+            });
+
+            // Placeholders
+            const ph = esCop ? PLACEHOLDERS.cop : PLACEHOLDERS.usd;
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.placeholder = ph[id];
+            });
+
+            // Unidad del resultado de capacidad de ahorro
+            document.getElementById('resCapacidadUnidad').textContent = esCop ? 'COP' : 'USD';
+        }
+
+        function cargarDatos() {
+            const monedaGuardada = leerLocal('moneda');
+            if (monedaGuardada === 'cop' || monedaGuardada === 'usd') {
+                monedaActual = monedaGuardada;
+            }
+
+            const tasaGuardada = leerLocal('tasaCambio');
+            if (tasaGuardada !== null) {
+                const num = parseFloat(tasaGuardada);
+                if (!isNaN(num) && num > 0) document.getElementById('tasaCambio').value = num;
+            }
+
+            actualizarUIMoneda();
+
+            inputs.forEach(id => {
+                const val = leerLocal(id);
+                if (val !== null) {
+                    const num = parseFloat(val);
+                    if (!isNaN(num) && num >= 0) document.getElementById(id).value = num;
+                }
+            });
+            calcularFinanzas();
+        }
+
+        function calcularFinanzas() {
+            const ingresos       = Math.max(0, parseFloat(document.getElementById('ingresos').value)       || 0);
+            const gastosFijos    = Math.max(0, parseFloat(document.getElementById('gastosFijos').value)    || 0);
+            const gastosHormiga  = Math.max(0, parseFloat(document.getElementById('gastosHormiga').value)  || 0);
+            const fondoAhorro    = Math.max(0, parseFloat(document.getElementById('fondoAhorro').value)    || 0);
+            const fondoInversion = Math.max(0, parseFloat(document.getElementById('fondoInversion').value) || 0);
+
+            const esCop = monedaActual === 'cop';
+            const tasaCambio = esCop
+                ? Math.max(1, parseFloat(document.getElementById('tasaCambio').value) || 3440)
+                : 1;
+
+            const totalGastos     = redondear(gastosFijos + gastosHormiga);
+            const capacidadAhorro = redondear(ingresos - totalGastos);
+            const ratioInversion  = ingresos > 0 ? Math.round((fondoInversion / ingresos) * 100) : null;
+
+            const metaFondo = gastosFijos * 3;
+            let progresoFondo = null;
+            if (metaFondo > 0) {
+                progresoFondo = Math.min(Math.round((fondoAhorro / metaFondo) * 100), 100);
+            }
+
+            // Capacidad de ahorro
+            const elCap = document.getElementById('resCapacidad');
+            elCap.innerText   = (capacidadAhorro >= 0 ? '$' : '-$') + formatearNumero(capacidadAhorro, esCop);
+            elCap.className   = capacidadAhorro >= 0
+                ? 'text-xl font-black text-emerald-400'
+                : 'text-xl font-black text-rose-400';
+
+            // Ratio inversión
+            document.getElementById('resRatioInversion').innerText = ratioInversion !== null ? `${ratioInversion}%` : '—';
+
+            // Progreso fondo
+            const elProg = document.getElementById('txtProgreso');
+            if (progresoFondo !== null) {
+                elProg.innerText = `${progresoFondo}%`;
+                elProg.className = 'text-emerald-400';
+                document.getElementById('barraProgreso').style.width = `${progresoFondo}%`;
+            } else {
+                elProg.innerText = '—';
+                elProg.className = 'text-slate-500';
+                document.getElementById('barraProgreso').style.width = '0%';
+            }
+
+            // Diagnóstico textual
+            const elMensaje = document.getElementById('mensajeDiag');
+            if (ingresos > 0 || gastosFijos > 0) {
+                elMensaje.innerText = mensajeDiagnostico(capacidadAhorro, progresoFondo ?? 0, progresoFondo >= 100);
+                elMensaje.classList.remove('hidden');
+            } else {
+                elMensaje.classList.add('hidden');
+            }
+
+            // BTC Urgency — se activa cuando hay capacidad de ahorro positiva
+            const BTC_PRICE = 62000; // USD aproximado
+            const elBtc = document.getElementById('btcUrgency');
+            const capitalDisponible = Math.max(0, capacidadAhorro);
+            // Convertimos siempre a USD antes de calcular BTC, sin importar la moneda elegida
+            const capitalDisponibleUSD = redondear(capitalDisponible / tasaCambio, 4);
+
+            const elEquivalencia = document.getElementById('btcEquivalencia');
+
+            if (capitalDisponible > 0 && ingresos > 0) {
+                const btc1y = redondear((capitalDisponibleUSD * 12) / BTC_PRICE, 8);
+                const btc5y = redondear((capitalDisponibleUSD * 60) / BTC_PRICE, 8);
+                document.getElementById('btc1y').innerText = btc1y.toFixed(6);
+                document.getElementById('btc5y').innerText = btc5y.toFixed(6);
+
+                if (esCop) {
+                    elEquivalencia.innerText = `Tu capacidad de ahorro mensual equivale a ≈ $${formatearNumero(capitalDisponibleUSD, false)} USD (tasa: 1 USD = ${formatearNumero(tasaCambio, true)} COP)`;
+                    elEquivalencia.classList.remove('hidden');
+                } else {
+                    elEquivalencia.classList.add('hidden');
+                }
+
+                const pct = Math.round((capitalDisponible / ingresos) * 100);
+                let msg = '';
+                if (pct < 10)
+                    msg = 'Incluso un 10% de tus ingresos en DCA mensual construye un patrimonio real en 5 años.';
+                else if (pct < 25)
+                    msg = 'Con tu capacidad actual ya puedes sistematizar un DCA mensual con impacto real.';
+                else
+                    msg = 'Tienes una posición financiera sólida. Es momento de hacer que tu dinero trabaje en DeFi.';
+                document.getElementById('btcMensaje').innerText = msg;
+                elBtc.classList.remove('hidden');
+            } else {
+                elBtc.classList.add('hidden');
+            }
+        }
+
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', (e) => {
+                if (parseFloat(e.target.value) < 0) e.target.value = 0;
+                guardarLocal(id, e.target.value);
+                calcularFinanzas();
+            });
+        });
+
+        document.getElementById('tasaCambio').addEventListener('input', (e) => {
+            if (parseFloat(e.target.value) < 0) e.target.value = 0;
+            guardarLocal('tasaCambio', e.target.value);
+            calcularFinanzas();
+        });
+
+        window.addEventListener('DOMContentLoaded', cargarDatos);
+    </script>
+</body>
+</html>
